@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 import {logout} from '../store'
+import SpotifyContainer from './spotify-container'
 
 const Navbar = ({handleClick, isLoggedIn}) => (
   <div>
@@ -21,6 +22,7 @@ const Navbar = ({handleClick, isLoggedIn}) => (
           {/* The navbar will show these links before you log in */}
           <Link to="/login">Login</Link>
           <Link to="/signup">Sign Up</Link>
+          <SpotifyContainer />
         </div>
       )}
     </nav>
