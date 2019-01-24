@@ -1,4 +1,4 @@
-`Establishing Norms`
+<h2>Group Grape Emu Norms</h2>
 
 - flexible on individual night/weekend work, organized by tasks more than time
 - will check slack before bed, after waking up (but not constantly)
