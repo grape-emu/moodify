@@ -1,22 +1,40 @@
 const router = require('express').Router()
 module.exports = router
-const request = require('request')
+const https = require('https')
+const token =
+  'BQA9_Uq__qyKc-78ut8eFOLazQez84lMDA_WmM7295qILW__zdvcoD1Z90_6HLJF5fjajg5LKbfHI7dk-RKGL-EQVfOtBElDsKAkprFSMUfLEUcv4GLBkMgvJLPnVzqamTMbjrg9JTRXc97vsmgb23YcTHUY6kVUn1m3mXG2KsO9LWyJ4eWi77jouye9RJ7cEIIaJAW8nLInDfhmGmiPQdognCtTat35nYI1tGGpiQT-UFhfS8Y'
+
+function spotifyAPI(params) {
+  return new Promise((resolve, reject) => {
+    let options = {
+      hostname: 'api.spotify.com',
+      port: 443,
+      path: '/v1/tracks/' + params,
+      method: 'GET',
+      headers: {
+        Authorization: ' Bearer ' + token
+      }
+    }
+
+    let httpsObject = https.get(options, res => {
+      let data = ''
+      res
+        .on('data', chunk => {
+          data += chunk
+        })
+        .on('end', () => {
+          resolve(data)
+        })
+        .on('error', err => {
+          reject(err)
+        })
+    })
+  })
+}
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const options = {
-      method: 'GET',
-      url: `https://api.spotify.com/v1/tracks/${req.params.id}`,
-      headers: {
-        Authorization:
-          'Bearer  BQDMEtWSCwohp1iLCFkLAecnIEDoIhv9-Rr3vBxl9zGdQL6NxJNNr_rgezVmIf2E22fpYTXm6R6fIcJoXI1SDbhPaG6SrS0xpJZbSJN4z0nwssMmgpILisESzJglxuI01wupQxZwenouEqlqJWTxEzhV8RA1CV_89S1ODA5iRfZAvdBYbz4B3jjEoMPGRf0eSUSGLgJRmREFJneip-bLKPqV9dFCljp4U3OiRCztJUHIvMSmR3k'
-      }
-    }
-    const data = await request(options, (error, response, body) => {
-      if (error) throw new Error(error)
-      //   console.log(body)
-      console.log(response)
-    })
+    const data = await spotifyAPI(req.params.id)
     res.json(data)
   } catch (err) {
     next(err)
