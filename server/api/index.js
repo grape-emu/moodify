@@ -3,6 +3,7 @@ module.exports = router
 
 // router.use('/s3', require('./externalApi'))
 router.use('/users', require('./users'))
+router.use('/spotify', require('./spotify'))
 
 router.use((req, res, next) => {
   const error = new Error('Not Found')
