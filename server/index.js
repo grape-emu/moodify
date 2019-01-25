@@ -9,6 +9,8 @@ const db = require('./db')
 const sessionStore = new SequelizeStore({db})
 const PORT = process.env.PORT || 8080
 const app = express()
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const socketio = require('socket.io')
 module.exports = app
 
@@ -70,6 +72,8 @@ const createApp = () => {
 
   // static file-serving middleware
   app.use(express.static(path.join(__dirname, '..', 'public')))
+
+  app.use(cors()).use(cookieParser())
 
   // any remaining requests with an extension (.js, .css, etc.) send 404
   app.use((req, res, next) => {
