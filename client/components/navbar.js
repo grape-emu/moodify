@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 import {logout} from '../store'
 import SpotifyContainer from './spotify-container'
+import RecommendationsButton from './RecommendationsButton'
 
 const Navbar = ({handleClick, isLoggedIn}) => (
   <div>
@@ -23,6 +24,7 @@ const Navbar = ({handleClick, isLoggedIn}) => (
           <Link to="/login">Login</Link>
           <Link to="/signup">Sign Up</Link>
           <SpotifyContainer />
+          <RecommendationsButton />
         </div>
       )}
     </nav>
