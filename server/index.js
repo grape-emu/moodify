@@ -9,6 +9,8 @@ const db = require('./db')
 const sessionStore = new SequelizeStore({db})
 const PORT = process.env.PORT || 8080
 const app = express()
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const socketio = require('socket.io')
 module.exports = app
 
@@ -26,7 +28,7 @@ if (process.env.NODE_ENV === 'test') {
  * keys as environment variables, so that they can still be read by the
  * Node process on process.env
  */
-if (process.env.NODE_ENV !== 'production') require('./api/secrets')
+// if (process.env.NODE_ENV !== 'production') require('./api/secrets')
 
 // passport registration
 passport.serializeUser((user, done) => done(null, user.id))
@@ -69,6 +71,8 @@ const createApp = () => {
 
   // static file-serving middleware
   app.use(express.static(path.join(__dirname, '..', 'public')))
+
+  app.use(cors()).use(cookieParser())
 
   // any remaining requests with an extension (.js, .css, etc.) send 404
   app.use((req, res, next) => {

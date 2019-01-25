@@ -1,14 +1,15 @@
 const express = require('express')
+const router = require('express').Router()
 const request = require('request')
-const cors = require('cors')
 const querystring = require('querystring')
-const cookieParser = require('cookie-parser')
 
-const {
-  REACT_APP_SPOTIFY_CLIENT_ID,
-  SPOTIFY_CLIENT_SECRET,
-  REACT_APP_SPOTIFY_PRODUCTION_REDIRECT_URI
-} = require('../../secrets')
+require('../../secrets')
+const spotifyClientID = process.env.REACT_APP_SPOTIFY_CLIENT_ID
+const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET
+const spotifyRedirectURL =
+  process.env.NODE_ENV === 'production'
+    ? process.env.REACT_APP_SPOTIFY_PRODUCTION_REDIRECT_URI
+    : process.env.REACT_APP_SPOTIFY_DEVELOPMENT_REDIRECT_URI
 
 /**
  * Generates a random string containing numbers and letters
@@ -30,12 +31,7 @@ const stateKey = 'spotify_auth_state'
 
 const app = express()
 
-app
-  .use(express.static(__dirname + '/public'))
-  .use(cors())
-  .use(cookieParser())
-
-app.get('/login', function(req, res) {
+router.get('/login', function(req, res) {
   const state = generateRandomString(16)
   res.cookie(stateKey, state)
 
@@ -45,15 +41,15 @@ app.get('/login', function(req, res) {
     'https://accounts.spotify.com/authorize?' +
       querystring.stringify({
         response_type: 'code',
-        REACT_APP_SPOTIFY_CLIENT_ID,
+        client_id: spotifyClientID,
         scope,
-        REACT_APP_SPOTIFY_PRODUCTION_REDIRECT_URI,
+        redirect_uri: spotifyRedirectURL,
         state
       })
   )
 })
 
-app.get('/callback', function(req, res) {
+router.get('/callback', function(req, res) {
   // your application requests refresh and access tokens
   // after checking the state parameter
 
@@ -74,15 +70,15 @@ app.get('/callback', function(req, res) {
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code,
-        REACT_APP_SPOTIFY_PRODUCTION_REDIRECT_URI,
+        redirect_uri: spotifyRedirectURL,
         grant_type: 'authorization_code'
       },
       headers: {
         Authorization:
           'Basic ' +
-          new Buffer(
-            REACT_APP_SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET
-          ).toString('base64')
+          new Buffer(spotifyClientID + ':' + spotifyClientSecret).toString(
+            'base64'
+          )
       },
       json: true
     }
@@ -124,7 +120,7 @@ app.get('/callback', function(req, res) {
   }
 })
 
-app.get('/refresh_token', function(req, res) {
+router.get('/refresh_token', function(req, res) {
   // requesting access token from refresh token
   const refresh_token = req.query.refresh_token
   const authOptions = {
@@ -132,14 +128,11 @@ app.get('/refresh_token', function(req, res) {
     headers: {
       Authorization:
         'Basic ' +
-        new Buffer(
-          REACT_APP_SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET
-        ).toString('base64')
+        new Buffer(spotifyClientID + ':' + spotifyClientSecret).toString(
+          'base64'
+        )
     },
-    form: {
-      grant_type: 'refresh_token',
-      refresh_token
-    },
+    form: {grant_type: 'refresh_token', refresh_token},
     json: true
   }
 
@@ -153,5 +146,4 @@ app.get('/refresh_token', function(req, res) {
   })
 })
 
-console.log('Listening on 8080')
-app.listen(8080)
+module.exports = router
