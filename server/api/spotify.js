@@ -1,15 +1,17 @@
 const router = require('express').Router()
 module.exports = router
+
 const https = require('https')
 const token =
-  'BQA9_Uq__qyKc-78ut8eFOLazQez84lMDA_WmM7295qILW__zdvcoD1Z90_6HLJF5fjajg5LKbfHI7dk-RKGL-EQVfOtBElDsKAkprFSMUfLEUcv4GLBkMgvJLPnVzqamTMbjrg9JTRXc97vsmgb23YcTHUY6kVUn1m3mXG2KsO9LWyJ4eWi77jouye9RJ7cEIIaJAW8nLInDfhmGmiPQdognCtTat35nYI1tGGpiQT-UFhfS8Y'
+  'BQBg4ZaQqe7NDcG9c9dJl1pJm-J5agSp0IRxnUPLcWpbvJQbAAkNuc71B-S9WcAVZ9N_1bIaih57RHHcxSxvRJ1trNIqbod99IR5wWaH0tRcPupBwRA2C6v7pJHBXmDMMhGDjej-wW98GkYtVmF_diD9-VITUIMOVFOFyUaLZ4t1Nd1btrx1eAgzjwkqhPhi3QfWbKYE0mAGeYYvalndPav14KVj0KTAWvaIYYg6xkdqYwSGY7M'
 
+//pass querry string to spotifyAPI
 function spotifyAPI(params) {
   return new Promise((resolve, reject) => {
     let options = {
       hostname: 'api.spotify.com',
       port: 443,
-      path: '/v1/tracks/' + params,
+      path: '/v1/' + params,
       method: 'GET',
       headers: {
         Authorization: ' Bearer ' + token
@@ -32,10 +34,14 @@ function spotifyAPI(params) {
   })
 }
 
-router.get('/:id', async (req, res, next) => {
+//this works if I hard-code it.
+//Tomorrow, figure out how to extract 'recommendations?seed_genres=blues&max_valence=0.5' from req.
+router.get('/find', async (req, res, next) => {
   try {
-    const data = await spotifyAPI(req.params.id)
-    res.json(data)
+    const data = await spotifyAPI(
+      'recommendations?seed_genres=blues&max_valence=0.5'
+    )
+    res.json(JSON.parse(data))
   } catch (err) {
     next(err)
   }
